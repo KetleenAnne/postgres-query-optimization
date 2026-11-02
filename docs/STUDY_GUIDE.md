@@ -2,6 +2,20 @@
 
 > Guia em português, com os termos técnicos em inglês (é como você vai ouvir nas entrevistas e na documentação). Os números vêm do próprio laboratório: veja [`results/`](../results/). As fontes estão em [SOURCES.md](SOURCES.md).
 
+## 📑 Sumário
+
+- [0. A ideia central em 1 minuto](#ideia)
+- [1. Como ler um `EXPLAIN` (sem medo)](#explain)
+- [2. Cenário 01: índice faltando na chave estrangeira](#c01)
+- [3. Cenário 02: subconsulta correlacionada](#c02)
+- [4. Cenário 03: índice parcial](#c03)
+- [5. Cenário 04: busca de texto com `%palavra%`](#c04)
+- [6. Quadro-resumo](#resumo)
+- [7. Armadilhas comuns](#armadilhas)
+- [8. Para ir além](#alem)
+
+<a id="ideia"></a>
+
 ## 0. A ideia central em 1 minuto
 
 Quando você manda uma query, o PostgreSQL **não executa direto**: o *planner* escolhe um plano (a "receita"). Otimizar é:
@@ -12,6 +26,8 @@ Quando você manda uma query, o PostgreSQL **não executa direto**: o *planner* 
 4. **Medir de novo** e comparar
 
 Regra de ouro: **uma mudança por vez**, senão você não sabe o que funcionou.
+
+<a id="explain"></a>
 
 ## 1. Como ler um `EXPLAIN` (sem medo)
 
@@ -36,6 +52,8 @@ O que olhar, em ordem:
 
 > ⚠️ `cost=` **não é tempo**: é uma estimativa em unidades arbitrárias. Use `actual time` e `Execution Time`.
 
+<a id="c01"></a>
+
 ## 2. Cenário 01: índice faltando na chave estrangeira
 
 **A query:** `SELECT count(*), max(loaned_at) FROM loans WHERE member_id = 4242;`
@@ -51,6 +69,8 @@ O que olhar, em ordem:
 **Para guardar:** *filtro ou JOIN por uma coluna em tabela grande? Pergunte "tem índice nela?"*. Em chave estrangeira, quase sempre vale ter.
 
 **Mas tem custo:** todo índice ocupa disco e deixa `INSERT/UPDATE/DELETE` um pouco mais lentos. Não é "índice em tudo".
+
+<a id="c02"></a>
 
 ## 3. Cenário 02: subconsulta correlacionada
 
@@ -72,6 +92,8 @@ Agora o plano vira `Nested Loop Anti Join`: para cada membro, basta achar **um**
 
 **Para guardar:** *ter o índice não basta; o formato da query importa.* `count(*) = 0` quer dizer "conte tudo"; `NOT EXISTS` quer dizer "existe algum?", e para no primeiro.
 
+<a id="c03"></a>
+
 ## 4. Cenário 03: índice parcial
 
 **A query:** os 50 empréstimos atrasados mais antigos (`returned_at IS NULL` e vencidos há mais de 30 dias), `ORDER BY due_at LIMIT 50`.
@@ -89,6 +111,8 @@ Só ~2% dos empréstimos estão em aberto, então o índice só guarda essas lin
 **Pegadinha:** a query precisa **repetir o predicado do índice** (`returned_at IS NULL`) para o planner poder usá-lo. Se você tirar essa condição da query, o índice parcial não serve.
 
 **Para guardar:** *quando você consulta sempre um pedaço pequeno e "quente" da tabela (pendentes, ativos, não processados), um índice parcial é menor, mais rápido e mais barato de manter.*
+
+<a id="c04"></a>
 
 ## 5. Cenário 04: busca de texto com `%palavra%`
 
@@ -108,6 +132,8 @@ A extensão `pg_trgm` quebra o texto em **trigramas** (pedaços de 3 letras) e o
 
 **Para guardar:** *busca "contém" em texto grande → trigram + GIN. Busca de linguagem natural (stemming, ranking) é outro assunto: full-text search.*
 
+<a id="resumo"></a>
+
 ## 6. Quadro-resumo
 
 | # | Sintoma no plano | Causa | Remédio |
@@ -117,6 +143,8 @@ A extensão `pg_trgm` quebra o texto em **trigramas** (pedaços de 3 letras) e o
 | 03 | `Sort` + `Seq Scan` para `LIMIT` pequeno em subconjunto | Índice completo seria grande/inútil | Índice **parcial** |
 | 04 | `Seq Scan` com `LIKE '%x%'` | B-tree não atende curinga no início | GIN + `pg_trgm` |
 
+<a id="armadilhas"></a>
+
 ## 7. Armadilhas comuns
 
 - **Medir uma vez só.** A primeira execução pode ser mais lenta (cache). O laboratório faz aquecimento + mediana de 5.
@@ -125,6 +153,8 @@ A extensão `pg_trgm` quebra o texto em **trigramas** (pedaços de 3 letras) e o
 - **Criar índice em produção sem pensar:** `CREATE INDEX` comum bloqueia escritas na tabela. Em produção, estude `CREATE INDEX CONCURRENTLY` (ver [SOURCES.md](SOURCES.md)).
 - **Achar que o índice sempre é usado.** Se a query devolve boa parte da tabela, o `Seq Scan` pode ser a melhor escolha, e o planner sabe disso.
 - **Concluir demais.** O laboratório é pequeno, com dados sintéticos e cache quente. As **proporções e os planos** ensinam; os milissegundos absolutos não.
+
+<a id="alem"></a>
 
 ## 8. Para ir além
 
