@@ -1,0 +1,21 @@
+Finalize Aggregate  (cost=23095.95..23095.96 rows=1 width=8) (actual time=79.776..80.364 rows=1 loops=1)
+  Buffers: shared hit=300283
+  ->  Gather  (cost=23095.73..23095.94 rows=2 width=8) (actual time=76.802..80.352 rows=3 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        Buffers: shared hit=300283
+        ->  Partial Aggregate  (cost=22095.73..22095.74 rows=1 width=8) (actual time=71.702..71.703 rows=1 loops=3)
+              Buffers: shared hit=300283
+              ->  Nested Loop Anti Join  (cost=0.72..22081.99 rows=5495 width=0) (actual time=62.695..71.539 rows=3333 loops=3)
+                    Buffers: shared hit=300283
+                    ->  Parallel Index Only Scan using members_pkey on members m  (cost=0.29..2020.96 rows=41667 width=8) (actual time=0.027..7.465 rows=33333 loops=3)
+                          Heap Fetches: 0
+                          Buffers: shared hit=278
+                    ->  Index Only Scan using loans_member_id_idx on loans l  (cost=0.43..0.91 rows=23 width=8) (actual time=0.002..0.002 rows=1 loops=100000)
+                          Index Cond: (member_id = m.id)
+                          Heap Fetches: 0
+                          Buffers: shared hit=300005
+Planning:
+  Buffers: shared hit=223
+Planning Time: 0.730 ms
+Execution Time: 80.439 ms

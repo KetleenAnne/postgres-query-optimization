@@ -1,0 +1,24 @@
+Aggregate  (cost=9456363.68..9456363.69 rows=1 width=8) (actual time=2869.085..2869.086 rows=1 loops=1)
+  Buffers: shared hit=2300019
+  ->  Seq Scan on members m  (cost=0.00..9456362.43 rows=500 width=0) (actual time=2851.096..2868.284 rows=10000 loops=1)
+        Filter: ((SubPlan 1) = 0)
+        Rows Removed by Filter: 90000
+        Buffers: shared hit=2300019
+        SubPlan 1
+          ->  Aggregate  (cost=94.53..94.54 rows=1 width=8) (actual time=0.027..0.027 rows=1 loops=100000)
+                Buffers: shared hit=2298852
+                ->  Bitmap Heap Scan on loans l  (cost=4.61..94.47 rows=23 width=0) (actual time=0.004..0.026 rows=20 loops=100000)
+                      Recheck Cond: (member_id = m.id)
+                      Heap Blocks: exact=1998852
+                      Buffers: shared hit=2298852
+                      ->  Bitmap Index Scan on loans_member_id_idx  (cost=0.00..4.60 rows=23 width=0) (actual time=0.002..0.002 rows=20 loops=100000)
+                            Index Cond: (member_id = m.id)
+                            Buffers: shared hit=300000
+Planning:
+  Buffers: shared hit=101
+Planning Time: 0.403 ms
+JIT:
+  Functions: 12
+  Options: Inlining true, Optimization true, Expressions true, Deforming true
+  Timing: Generation 0.341 ms, Inlining 53.186 ms, Optimization 10.366 ms, Emission 12.448 ms, Total 76.341 ms
+Execution Time: 2883.473 ms

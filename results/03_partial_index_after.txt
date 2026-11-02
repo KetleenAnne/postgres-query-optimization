@@ -1,0 +1,9 @@
+Limit  (cost=0.29..97.36 rows=50 width=24) (actual time=0.046..0.494 rows=50 loops=1)
+  Buffers: shared hit=52
+  ->  Index Scan using loans_open_due_idx on loans  (cost=0.29..75827.53 rows=39059 width=24) (actual time=0.045..0.486 rows=50 loops=1)
+        Index Cond: (due_at < (now() - '30 days'::interval))
+        Buffers: shared hit=52
+Planning:
+  Buffers: shared hit=98
+Planning Time: 0.602 ms
+Execution Time: 0.538 ms

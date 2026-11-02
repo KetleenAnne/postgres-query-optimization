@@ -1,0 +1,16 @@
+Finalize Aggregate  (cost=30094.94..30094.95 rows=1 width=16) (actual time=95.690..98.848 rows=1 loops=1)
+  Buffers: shared hit=18678
+  ->  Gather  (cost=30094.72..30094.93 rows=2 width=16) (actual time=95.658..98.817 rows=3 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        Buffers: shared hit=18678
+        ->  Partial Aggregate  (cost=29094.72..29094.73 rows=1 width=16) (actual time=88.586..88.588 rows=1 loops=3)
+              Buffers: shared hit=18678
+              ->  Parallel Seq Scan on loans  (cost=0.00..29094.67 rows=10 width=8) (actual time=7.299..88.561 rows=5 loops=3)
+                    Filter: (member_id = 4242)
+                    Rows Removed by Filter: 666662
+                    Buffers: shared hit=18678
+Planning:
+  Buffers: shared hit=69
+Planning Time: 0.308 ms
+Execution Time: 98.914 ms

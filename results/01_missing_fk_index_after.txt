@@ -1,0 +1,13 @@
+Aggregate  (cost=94.59..94.60 rows=1 width=16) (actual time=0.228..0.229 rows=1 loops=1)
+  Buffers: shared hit=21
+  ->  Bitmap Heap Scan on loans  (cost=4.61..94.47 rows=23 width=8) (actual time=0.068..0.212 rows=15 loops=1)
+        Recheck Cond: (member_id = 4242)
+        Heap Blocks: exact=15
+        Buffers: shared hit=21
+        ->  Bitmap Index Scan on loans_member_id_idx  (cost=0.00..4.60 rows=23 width=0) (actual time=0.043..0.043 rows=15 loops=1)
+              Index Cond: (member_id = 4242)
+              Buffers: shared hit=6
+Planning:
+  Buffers: shared hit=86
+Planning Time: 0.490 ms
+Execution Time: 0.301 ms

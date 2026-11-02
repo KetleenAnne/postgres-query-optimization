@@ -1,0 +1,16 @@
+Finalize Aggregate  (cost=5911.74..5911.76 rows=1 width=8) (actual time=124.687..124.806 rows=1 loops=1)
+  Buffers: shared hit=3349
+  ->  Gather  (cost=5911.53..5911.74 rows=2 width=8) (actual time=118.774..124.789 rows=3 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        Buffers: shared hit=3349
+        ->  Partial Aggregate  (cost=4911.53..4911.54 rows=1 width=8) (actual time=115.694..115.695 rows=1 loops=3)
+              Buffers: shared hit=3349
+              ->  Parallel Seq Scan on books  (cost=0.00..4911.50 rows=12 width=0) (actual time=0.640..115.622 rows=95 loops=3)
+                    Filter: (title ~~* '%lighthouse%'::text)
+                    Rows Removed by Filter: 99905
+                    Buffers: shared hit=3349
+Planning:
+  Buffers: shared hit=57
+Planning Time: 0.406 ms
+Execution Time: 124.882 ms

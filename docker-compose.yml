@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16
+    container_name: pg-query-optimization
+    environment:
+      POSTGRES_USER: lab
+      POSTGRES_PASSWORD: lab
+      POSTGRES_DB: lab
+    ports:
+      - "5432:5432"
+    command: ["postgres", "-c", "shared_buffers=256MB", "-c", "max_parallel_workers_per_gather=2"]
+    volumes:
+      # runs 00_schema.sql and 01_seed.sql automatically on the first start
+      - ./sql:/docker-entrypoint-initdb.d:ro

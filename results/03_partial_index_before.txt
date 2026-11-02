@@ -1,0 +1,20 @@
+Limit  (cost=34805.66..34811.49 rows=50 width=24) (actual time=77.207..78.693 rows=50 loops=1)
+  Buffers: shared hit=18752
+  ->  Gather Merge  (cost=34805.66..38629.09 rows=32770 width=24) (actual time=77.205..78.686 rows=50 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        Buffers: shared hit=18752
+        ->  Sort  (cost=33805.63..33846.59 rows=16385 width=24) (actual time=69.872..69.877 rows=39 loops=3)
+              Sort Key: due_at
+              Sort Method: top-N heapsort  Memory: 31kB
+              Buffers: shared hit=18752
+              Worker 0:  Sort Method: top-N heapsort  Memory: 30kB
+              Worker 1:  Sort Method: top-N heapsort  Memory: 30kB
+              ->  Parallel Seq Scan on loans  (cost=0.00..33261.33 rows=16385 width=24) (actual time=0.020..66.722 rows=12866 loops=3)
+                    Filter: ((returned_at IS NULL) AND (due_at < (now() - '30 days'::interval)))
+                    Rows Removed by Filter: 653801
+                    Buffers: shared hit=18678
+Planning:
+  Buffers: shared hit=81
+Planning Time: 0.357 ms
+Execution Time: 78.743 ms
