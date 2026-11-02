@@ -47,6 +47,9 @@ cat results/summary.md
 Requirements: Docker and the `psql` client. The scenarios were run against PostgreSQL 16.
 Requisitos: Docker e o cliente `psql`. Os cenários foram executados no PostgreSQL 16.
 
+📚 New to this? Start with the [docs](docs/): [Getting started](docs/GETTING_STARTED.md) · [Study guide (PT)](docs/STUDY_GUIDE.md) · [Glossary](docs/GLOSSARY.md) · [Exercises](docs/EXERCISES.md) · [Interview prep](docs/INTERVIEW_PREP.md) · [Sources](docs/SOURCES.md)
+📚 Começando agora? Veja a pasta [docs](docs/).
+
 ## 🗂️ Structure · Estrutura
 
 ```
